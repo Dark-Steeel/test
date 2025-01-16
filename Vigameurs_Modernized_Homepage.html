@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigameurs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0b0f1a, #161b22);
+            color: #ffffff;
+        }
+        header {
+            background: #161b22;
+            color: #fff;
+            padding: 1rem 0;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ff0000;
+            text-transform: uppercase;
+        }
+        header nav a {
+            color: #dcdcdc;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        header nav a:hover {
+            color: #ff8c00;
+        }
+        .search-bar {
+            margin: 1rem auto;
+            text-align: center;
+        }
+        .search-bar input {
+            width: 80%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 25px;
+            background: #1f2530;
+            color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+            font-size: 1rem;
+            outline: none;
+        }
+        .featured-videos {
+            padding: 3rem 2rem;
+            background: url('magnifique-paysage-montagneux_23-2151151035.avif') no-repeat center center/cover;
+            color: #ffffff;
+        }
+        .featured-videos h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            color: #ff8c00;
+            font-weight: 700;
+        }
+        .video-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .video {
+            max-width: 300px;
+            background: #1f2530;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .video:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.7);
+        }
+        .video video {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .video p {
+            text-align: center;
+            margin-top: 0.8rem;
+            font-size: 1rem;
+        }
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 3rem 0;
+            background: #1a202c;
+            color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .features .feature {
+            text-align: center;
+            max-width: 300px;
+            padding: 1rem;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        .features .feature:hover {
+            transform: scale(1.05);
+        }
+        .features .feature img {
+            width: 100px;
+            margin-bottom: 1rem;
+        }
+        .features h3 {
+            color: #ff8c00;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        footer {
+            background: #0d1117;
+            color: #dcdcdc;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+        footer a {
+            color: #ff8c00;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        footer a:hover {
+            color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Vigameurs</div>
+            <nav>
+                <a href="#">Accueil</a>
+                <a href="#features">Fonctionnalités</a>
+                <a href="#pricing">Tarifs</a>
+                <a href="#">Connexion</a>
+            </nav>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher des vidéos...">
+        </div>
+    </header>
+
+    <section class="featured-videos">
+        <h2>Vidéos en Vedette</h2>
+        <div class="video-grid">
+            <div class="video">
+                <video controls>
+                    <source src="video1.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture vidéo.
+                </video>
+                <p>Vidéo populaire #1</p>
+            </div>
+            <div class="video">
+                <video controls>
+                    <source src="video2.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture vidéo.
+                </video>
+                <p>Vidéo populaire #2</p>
+            </div>
+        </div>
+        <div class="infinite-videos">
+            <h3>Autres Vidéos</h3>
+            <div class="video-grid">
+                <div class="video">
+                    <video controls>
+                        <source src="video3.mp4" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                    <p>Vidéo supplémentaire</p>
+                </div>
+                <div class="video">
+                    <video controls>
+                        <source src="video4.mp4" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                    <p>Vidéo supplémentaire</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="feature">
+            <img src="streaming-icon.png" alt="Streaming">
+            <h3>Streaming en direct</h3>
+            <p>Diffusez vos parties en temps réel avec une qualité ultra-rapide.</p>
+        </div>
+        <div class="feature">
+            <img src="video-icon.png" alt="Vidéo">
+            <h3>Partage de vidéos</h3>
+            <p>Publiez vos meilleurs moments et inspirez la communauté.</p>
+        </div>
+        <div class="feature">
+            <img src="community-icon.png" alt="Communauté">
+            <h3>Communauté interactive</h3>
+            <p>Connectez-vous avec d'autres gamers et partagez vos passions.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Plateforme Gamer. Tous droits réservés. <a href="#">Mentions légales</a></p>
+    </footer>
+</body>
+</html>
