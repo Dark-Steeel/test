@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vigameurs - Profil</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #222;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 2rem;
+    }
+    .profile-card {
+      display: inline-block;
+      background: #333;
+      padding: 2rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+      max-width: 500px;
+      width: 90%;
+    }
+    .profile-card h1 {
+      color: #ff8c00;
+      margin-top: 0;
+    }
+    .back-btn {
+      margin-top: 2rem;
+      background: #ff8c00;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-btn:hover {
+      background: #ffa500;
+    }
+  </style>
+</head>
+<body>
+  <h1>Page de Profil</h1>
+  <div id="profile-container"></div>
+  <button class="back-btn" id="back-home">Retour à l’accueil</button>
+
+  <script>
+    // Récupérer le paramètre ?uid dans l’URL
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('uid');
+
+    // Charger la liste des utilisateurs
+    let users = JSON.parse(localStorage.getItem('vigameursUsers')) || [];
+    const user = users.find(u => u.userId === userId);
+
+    const profileContainer = document.getElementById('profile-container');
+    const backHomeBtn = document.getElementById('back-home');
+
+    if (!user) {
+      // Pas trouvé
+      profileContainer.innerHTML = `
+        <p>Aucun utilisateur ne correspond à l’ID <b>${userId}</b>.</p>
+        <p>Il est possible que vous ne soyez pas connecté ou que le compte n’existe plus.</p>
+      `;
+    } else {
+      // Afficher un mini-profil
+      const dateCreation = new Date(user.createdAt).toLocaleString();
+      profileContainer.innerHTML = `
+        <div class="profile-card">
+          <h1>${user.username}</h1>
+          <p><strong>ID :</strong> ${user.userId}</p>
+          <p><strong>Compte créé le :</strong> ${dateCreation}</p>
+        </div>
+      `;
+    }
+
+    // Bouton retour
+    backHomeBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
