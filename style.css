@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vigameurs - Multi-Utilisateurs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Roboto (Google Fonts) -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ----------------------  STYLES GLOBAUX  ---------------------- */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0b0f1a, #161b22);
+      color: #ffffff;
+      transition: background 0.5s, color 0.5s;
+    }
+    /* Thème clair */
+    body.light {
+      background: #f0f0f0;
+      color: #333333;
+    }
+
+    /* ----------------------  HEADER  ---------------------- */
+    header {
+      background: #161b22;
+      color: #fff;
+      padding: 1rem 0;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: transform 0.3s ease; /* pour le header rétractable */
+    }
+    body.light header {
+      background: #d4d4d4;
+      color: #333333;
+    }
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ff0000;
+      text-transform: uppercase;
+    }
+    nav a {
+      color: #dcdcdc;
+      text-decoration: none;
+      margin-left: 20px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: #ff8c00;
+    }
+    body.light nav a {
+      color: #333333;
+    }
+
+    /* Bouton pour passer du mode clair / sombre */
+    .theme-toggle-btn {
+      margin-left: 20px;
+      background: none;
+      border: 1px solid #ff8c00;
+      color: #ff8c00;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .theme-toggle-btn:hover {
+      background: #ff8c00;
+      color: #ffffff;
+    }
+
+    /* ----------------------  BARRE DE RECHERCHE  ---------------------- */
+    .search-bar {
+      margin: 1rem auto;
+      text-align: center;
+    }
+    .search-bar input {
+      width: 80%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 25px;
+      background: #1f2530;
+      color: #ffffff;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+      font-size: 1rem;
+      outline: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light .search-bar input {
+      background: #e5e5e5;
+      color: #333333;
+    }
+
+    /* ----------------------  SECTION VIDEOS  ---------------------- */
+    .featured-videos {
+      padding: 3rem 2rem;
+      background: url('magnifique-paysage-montagneux_23-2151151035.avif') no-repeat center center/cover;
+      color: #ffffff;
+    }
+    body.light .featured-videos {
+      background: #dedede;
+      color: #333333;
+    }
+    .featured-videos h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+      color: #ff8c00;
+      font-weight: 700;
+    }
+    body.light .featured-videos h2 {
+      color: #ff6500;
+    }
+    .video-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+    .video {
+      max-width: 300px;
+      background: #1f2530;
+      border-radius: 15px;
+      padding: 1rem;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+    .video:hover {
+      transform: scale(1.05);
+      box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.7);
+    }
+    body.light .video {
+      background: #e5e5e5;
+      color: #333333;
+    }
+    .video video {
+      width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
+    .video p {
+      text-align: center;
+      margin-top: 0.8rem;
+      font-size: 1rem;
+    }
+    /* Bouton de lecture custom */
+    .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.6);
+      color: #ff8c00;
+      border: 2px solid #ff8c00;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .video:hover .play-btn {
+      opacity: 1;
+    }
+    .play-btn:hover {
+      background: #ff8c00;
+      color: #fff;
+      border-color: #ff8c00;
+    }
+    .play-btn.paused::before {
+      content: '⏸';
+    }
+    .play-btn.playing::before {
+      content: '▶';
+    }
+
+    .like-container {
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    .like-btn {
+      background: none;
+      border: 1px solid #ff8c00;
+      color: #ff8c00;
+      padding: 0.3rem 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .like-btn:hover {
+      background: #ff8c00;
+      color: #fff;
+    }
+    .like-count {
+      display: inline-block;
+      margin-left: 0.5rem;
+    }
+
+    /* ----------------------  SECTION FEATURES  ---------------------- */
+    .features {
+      display: flex;
+      justify-content: space-around;
+      padding: 3rem 0;
+      background: #1a202c;
+      color: #ffffff;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+    }
+    body.light .features {
+      background: #cccccc;
+      color: #333333;
+    }
+    .features .feature {
+      text-align: center;
+      max-width: 300px;
+      padding: 1rem;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+    .features .feature:hover {
+      transform: scale(1.05);
+    }
+    .features .feature img {
+      width: 100px;
+      margin-bottom: 1rem;
+    }
+    .features h3 {
+      color: #ff8c00;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    body.light .features h3 {
+      color: #ff6500;
+    }
+
+    /* ----------------------  FOOTER  ---------------------- */
+    footer {
+      background: #0d1117;
+      color: #dcdcdc;
+      text-align: center;
+      padding: 1.5rem 0;
+      margin-top: 3rem;
+      transition: background 0.5s;
+    }
+    body.light footer {
+      background: #e8e8e8;
+      color: #333333;
+    }
+    footer a {
+      color: #ff8c00;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    footer a:hover {
+      color: #ffa500;
+    }
+
+    /* ----------------------  BOUTON SCROLL TOP  ---------------------- */
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background-color: #ff8c00;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none; /* masqué par défaut */
+      z-index: 9999;
+      transition: background 0.3s;
+    }
+    #scrollTopBtn:hover {
+      background-color: #ffa500;
+    }
+
+    /* ----------------------  MODAL AUTH  ---------------------- */
+    .modal-overlay {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none; /* caché par défaut */
+      justify-content: center;
+      align-items: center;
+      z-index: 99999; /* plus haut que le header */
+    }
+    .modal {
+      background: #1f2530;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 300px;
+      max-width: 90%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .modal h2 {
+      margin-top: 0;
+      color: #ff8c00;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      background: none;
+      border: none;
+      color: #ff8c00;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      color: #ffa500;
+    }
+    .modal form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .modal label {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .modal input[type="text"],
+    .modal input[type="password"] {
+      padding: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      background: #2b2f3b;
+      color: #fff;
+    }
+    .modal input[type="text"]:focus,
+    .modal input[type="password"]:focus {
+      outline: 2px solid #ff8c00;
+    }
+    .modal button[type="submit"] {
+      background: #ff8c00;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .modal button[type="submit"]:hover {
+      background: #ffa500;
+    }
+    #auth-message {
+      color: #ff8c00;
+      font-weight: bold;
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    /* ----------------------  MODAL MON COMPTE  ---------------------- */
+    #account-modal .modal {
+      background: #2a2f3b;
+    }
+    #account-modal .modal h2 {
+      color: #00aaff;
+    }
+    #go-profile-btn {
+      margin-top: 1rem;
+      background: #ff8c00;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #logout-btn {
+      margin-top: 1rem;
+      background: #b02a2a;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #go-profile-btn:hover {
+      background: #ffa500;
+    }
+    #logout-btn:hover {
+      background: #e62929;
+    }
+  </style>
+</head>
+<body>
+  <!-- ====================== HEADER ====================== -->
+  <header id="main-header">
+    <div class="header-container">
+      <div class="logo">Vigameurs</div>
+      <nav>
+        <a href="#">Accueil</a>
+        <a href="#features">Fonctionnalités</a>
+        <a href="#pricing">Tarifs</a>
+        <!-- Lien pour ouvrir la modale de connexion/inscription -->
+        <a href="#" id="open-auth">Connexion</a>
+        <!-- Lien pour ouvrir "Mon compte" (caché tant qu’on n’est pas connecté) -->
+        <a href="#" id="open-account" style="display:none;">Mon compte</a>
+        <!-- Bouton pour changer de thème -->
+        <button class="theme-toggle-btn" id="theme-toggle">Mode clair</button>
+      </nav>
+    </div>
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Rechercher des vidéos...">
+    </div>
+  </header>
+  <!-- fin du HEADER -->
+
+  <!-- ====================== SECTION VIDÉOS ====================== -->
+  <section class="featured-videos">
+    <h2>Vidéos en Vedette</h2>
+    <div class="video-grid">
+      <!-- Vidéo #1 -->
+      <div class="video">
+        <video id="video1">
+          <source src="video1.mp4" type="video/mp4">
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+        <div class="play-btn playing" data-video="video1"></div>
+        <p>Vidéo populaire #1</p>
+        <div class="like-container">
+          <button class="like-btn" data-video="video1">Like</button>
+          <span class="like-count" id="like-count-video1">0</span>
+        </div>
+      </div>
+      <!-- Vidéo #2 -->
+      <div class="video">
+        <video id="video2">
+          <source src="video2.mp4" type="video/mp4">
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+        <div class="play-btn playing" data-video="video2"></div>
+        <p>Vidéo populaire #2</p>
+        <div class="like-container">
+          <button class="like-btn" data-video="video2">Like</button>
+          <span class="like-count" id="like-count-video2">0</span>
+        </div>
+      </div>
+    </div>
+    <div class="infinite-videos">
+      <h3>Autres Vidéos</h3>
+      <div class="video-grid">
+        <div class="video">
+          <video id="video3">
+            <source src="video3.mp4" type="video/mp4">
+            Votre navigateur ne supporte pas la lecture vidéo.
+          </video>
+          <div class="play-btn playing" data-video="video3"></div>
+          <p>Vidéo supplémentaire #3</p>
+          <div class="like-container">
+            <button class="like-btn" data-video="video3">Like</button>
+            <span class="like-count" id="like-count-video3">0</span>
+          </div>
+        </div>
+        <div class="video">
+          <video id="video4">
+            <source src="video4.mp4" type="video/mp4">
+            Votre navigateur ne supporte pas la lecture vidéo.
+          </video>
+          <div class="play-btn playing" data-video="video4"></div>
+          <p>Vidéo supplémentaire #4</p>
+          <div class="like-container">
+            <button class="like-btn" data-video="video4">Like</button>
+            <span class="like-count" id="like-count-video4">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== SECTION FEATURES ====================== -->
+  <section class="features" id="features">
+    <div class="feature">
+      <img src="images/streaming-icon.png" alt="Streaming">
+      <h3>Streaming en direct</h3>
+      <p>Diffusez vos parties en temps réel avec une qualité ultra-rapide.</p>
+    </div>
+    <div class="feature">
+      <img src="images/
+      video-icon.png" alt="Vidéo">
+      <h3>Partage de vidéos</h3>
+      <p>Publiez vos meilleurs moments et inspirez la communauté.</p>
+    </div>
+    <div class="feature">
+      <img src="images/community-icon.png" alt="Communauté">
+      <h3>Communauté interactive</h3>
+      <p>Connectez-vous avec d'autres gamers et partagez vos passions.</p>
+    </div>
+  </section>
+
+  <!-- ====================== FOOTER ====================== -->
+  <footer>
+    <p>&copy; 2025 Plateforme Gamer. Tous droits réservés. <a href="#">Mentions légales</a></p>
+  </footer>
+
+  <!-- ====================== BOUTON SCROLL TOP ====================== -->
+  <button id="scrollTopBtn">↑ Haut</button>
+
+  <!-- ====================== MODALE AUTH (Connexion/Inscription) ====================== -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal">
+      <button class="close-btn" id="close-auth">X</button>
+      <h2>Connexion / Inscription</h2>
+      <form id="auth-form">
+        <label for="auth-username">Pseudo (ou email) :</label>
+        <input type="text" id="auth-username" required>
+        <label for="auth-password">Mot de passe :</label>
+        <input type="password" id="auth-password" required>
+        <button type="submit">Valider</button>
+        <div id="auth-message"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================== MODALE "MON COMPTE" ====================== -->
+  <div class="modal-overlay" id="account-modal">
+    <div class="modal">
+      <button class="close-btn" id="close-account">X</button>
+      <h2>Mon compte</h2>
+      <p>Bienvenue <span id="account-username"></span> !</p>
+      <!-- Bouton qui redirige vers la page de profil (profile.html) -->
+      <button id="go-profile-btn">Aller à mon profil</button>
+      <!-- Déconnexion -->
+      <button id="logout-btn">Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- ====================== JAVASCRIPT ====================== -->
+  <script>
+    /* ------------------------------------------------------------------
+       0) Gestion multi-users dans localStorage
+    ------------------------------------------------------------------ */
+    // On stocke un tableau `vigameursUsers` : [{ userId, username, password, createdAt, avatar, email }, ...]
+    // On stocke `vigameursCurrentUser` : userId de l'utilisateur connecté
+    let users = JSON.parse(localStorage.getItem('vigameursUsers')) || [];
+    let currentUserId = localStorage.getItem('vigameursCurrentUser') || null;
+
+    /* ------------------------------------------------------------------
+       1) Header rétractable au scroll
+    ------------------------------------------------------------------ */
+    const header = document.getElementById('main-header');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll > lastScroll) {
+        // Vers le bas => on cache le header
+        header.style.transform = 'translateY(-100%)';
+      } else {
+        // Vers le haut => on ré-affiche le header
+        header.style.transform = 'translateY(0)';
+      }
+      lastScroll = currentScroll;
+    });
+
+    /* ------------------------------------------------------------------
+       2) Mode clair / mode sombre
+    ------------------------------------------------------------------ */
+    const body = document.body;
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    // Charger le thème si stocké
+    const savedTheme = localStorage.getItem('vigameursTheme');
+    if (savedTheme) {
+      body.classList.add(savedTheme);
+      if (savedTheme === 'light') {
+        themeToggleBtn.textContent = 'Mode sombre';
+      }
+    }
+    themeToggleBtn.addEventListener('click', () => {
+      if (body.classList.contains('light')) {
+        body.classList.remove('light');
+        themeToggleBtn.textContent = 'Mode clair';
+        localStorage.setItem('vigameursTheme', '');
+      } else {
+        body.classList.add('light');
+        themeToggleBtn.textContent = 'Mode sombre';
+        localStorage.setItem('vigameursTheme', 'light');
+      }
+    });
+
+    /* ------------------------------------------------------------------
+       3) Recherche dynamique
+    ------------------------------------------------------------------ */
+    const searchInput = document.getElementById('search-input');
+    const allVideos = document.querySelectorAll('.video');
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase().trim();
+      allVideos.forEach(video => {
+        const videoText = video.querySelector('p').textContent.toLowerCase();
+        video.style.display = videoText.includes(query) ? 'block' : 'none';
+      });
+    });
+
+    /* ------------------------------------------------------------------
+       4) Boutons Play/Pause custom sur les vidéos
+    ------------------------------------------------------------------ */
+    const playButtons = document.querySelectorAll('.play-btn');
+    playButtons.forEach(button => {
+      const videoId = button.getAttribute('data-video');
+      const videoElement = document.getElementById(videoId);
+
+      button.addEventListener('click', () => {
+        if (videoElement.paused) {
+          videoElement.play();
+          button.classList.remove('playing');
+          button.classList.add('paused');
+        } else {
+          videoElement.pause();
+          button.classList.remove('paused');
+          button.classList.add('playing');
+        }
+      });
+      // Si l'utilisateur met la vidéo en pause autrement :
+      videoElement.addEventListener('pause', () => {
+        button.classList.remove('paused');
+        button.classList.add('playing');
+      });
+      // Si la vidéo se met à jouer autrement :
+      videoElement.addEventListener('play', () => {
+        button.classList.remove('playing');
+        button.classList.add('paused');
+      });
+    });
+
+    /* ------------------------------------------------------------------
+       5) Système de "Like"
+    ------------------------------------------------------------------ */
+    const likeButtons = document.querySelectorAll('.like-btn');
+    likeButtons.forEach(button => {
+      const videoKey = button.getAttribute('data-video');
+      const likeCountSpan = document.getElementById(`like-count-${videoKey}`);
+      const savedLikes = localStorage.getItem(`likes-${videoKey}`);
+      if (savedLikes) {
+        likeCountSpan.textContent = savedLikes;
+      }
+      button.addEventListener('click', () => {
+        let currentLikes = parseInt(likeCountSpan.textContent, 10);
+        currentLikes++;
+        likeCountSpan.textContent = currentLikes;
+        localStorage.setItem(`likes-${videoKey}`, currentLikes);
+      });
+    });
+
+    /* ------------------------------------------------------------------
+       6) Bouton "Scroll to Top"
+    ------------------------------------------------------------------ */
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.style.display = 'block';
+      } else {
+        scrollTopBtn.style.display = 'none';
+      }
+    });
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* ------------------------------------------------------------------
+       7) Authentification multi-users (Connexion/Inscription)
+    ------------------------------------------------------------------ */
+    const openAuthLink = document.getElementById('open-auth');
+    const closeAuthBtn = document.getElementById('close-auth');
+    const authModal = document.getElementById('auth-modal');
+    const authForm = document.getElementById('auth-form');
+    const authMessage = document.getElementById('auth-message');
+    const authUsernameInput = document.getElementById('auth-username');
+    const authPasswordInput = document.getElementById('auth-password');
+
+    // Vérifie si un user est déjà logué
+    const openAccountLink = document.getElementById('open-account');
+    if (currentUserId) {
+      openAuthLink.style.display = 'none';
+      openAccountLink.style.display = 'inline-block';
+    }
+
+    // Ouvrir la modale d’auth
+    openAuthLink.addEventListener('click', e => {
+      e.preventDefault();
+      authModal.style.display = 'flex';
+    });
+    // Fermer
+    closeAuthBtn.addEventListener('click', () => {
+      authModal.style.display = 'none';
+      authMessage.textContent = '';
+      authForm.reset();
+    });
+    window.addEventListener('click', e => {
+      if (e.target === authModal) {
+        authModal.style.display = 'none';
+        authMessage.textContent = '';
+        authForm.reset();
+      }
+    });
+
+    // Form Connexion / Inscription
+    authForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const username = authUsernameInput.value.trim();
+      const password = authPasswordInput.value.trim();
+      if (!username || !password) {
+        authMessage.style.color = '#ff8c00';
+        authMessage.textContent = 'Champs requis.';
+        return;
+      }
+      // Chercher si l’utilisateur existe déjà
+      let user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (user) {
+        // Utilisateur existe => on vérifie le mot de passe
+        if (user.password === password) {
+          // Connexion OK
+          currentUserId = user.userId;
+          localStorage.setItem('vigameursCurrentUser', currentUserId);
+          authMessage.style.color = 'lime';
+          authMessage.textContent = 'Connexion réussie !';
+
+          openAuthLink.style.display = 'none';
+          openAccountLink.style.display = 'inline-block';
+
+          setTimeout(() => {
+            authModal.style.display = 'none';
+            authMessage.textContent = '';
+            authForm.reset();
+          }, 1000);
+        } else {
+          // Mauvais mdp
+          authMessage.style.color = 'orange';
+          authMessage.textContent = 'Mot de passe incorrect.';
+        }
+      } else {
+        // Créer un nouvel utilisateur
+        const newUser = {
+          username,                // on considère ça comme pseudo ou email
+          password,
+          userId: generateId(),
+          createdAt: Date.now(),
+          // Optionnel : avatar et email
+          // Pour l'exemple, on utilise username comme email, + un avatar par défaut
+          email: username,  
+          avatar: 'https://via.placeholder.com/120x120.png?text=Avatar'
+        };
+        users.push(newUser);
+        localStorage.setItem('vigameursUsers', JSON.stringify(users));
+        currentUserId = newUser.userId;
+        localStorage.setItem('vigameursCurrentUser', currentUserId);
+        authMessage.style.color = 'lime';
+        authMessage.textContent = 'Compte créé et connecté !';
+
+        openAuthLink.style.display = 'none';
+        openAccountLink.style.display = 'inline-block';
+
+        setTimeout(() => {
+          authModal.style.display = 'none';
+          authMessage.textContent = '';
+          authForm.reset();
+        }, 1000);
+      }
+    });
+
+    function generateId() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    /* ------------------------------------------------------------------
+       8) Mon compte (modale)
+    ------------------------------------------------------------------ */
+    const accountModal = document.getElementById('account-modal');
+    const closeAccountBtn = document.getElementById('close-account');
+    const accountUsernameSpan = document.getElementById('account-username');
+    const goProfileBtn = document.getElementById('go-profile-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    openAccountLink.addEventListener('click', e => {
+      e.preventDefault();
+      // Trouver l’utilisateur courant
+      let currentUser = users.find(u => u.userId === currentUserId);
+      if (!currentUser) return;
+      accountUsernameSpan.textContent = currentUser.username;
+      accountModal.style.display = 'flex';
+    });
+    closeAccountBtn.addEventListener('click', () => {
+      accountModal.style.display = 'none';
+    });
+    window.addEventListener('click', e => {
+      if (e.target === accountModal) {
+        accountModal.style.display = 'none';
+      }
+    });
+
+    // Aller au profil
+    goProfileBtn.addEventListener('click', () => {
+      if (!currentUserId) return;
+      // Redirige vers profile.html avec le paramètre ?uid=...
+      window.location.href = `profile.html?uid=${currentUserId}`;
+    });
+
+    // Déconnexion
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('vigameursCurrentUser');
+      currentUserId = null;
+      accountModal.style.display = 'none';
+      openAuthLink.style.display = 'inline-block';
+      openAccountLink.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

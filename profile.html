@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vigameurs - Profil</title>
+  <style>
+    /* ----------- RESET / BASE ----------- */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #2b2b2b;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    /* ----------- HEADER SIMPLE ----------- */
+    header {
+      background: #161b22;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+    header h1 {
+      color: #ff8c00;
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    /* ----------- PROFILE CONTAINER ----------- */
+    .profile-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ----------- PROFILE CARD ----------- */
+    .profile-card {
+      background: #333;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .profile-header img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #ff8c00;
+      margin-bottom: 1rem;
+    }
+    .profile-header h2 {
+      margin: 0;
+      color: #ff8c00;
+      font-size: 1.5rem;
+    }
+    .profile-info {
+      background: #444;
+      padding: 1rem;
+      border-radius: 5px;
+      margin-top: 1rem;
+      text-align: left;
+    }
+    .profile-info p {
+      margin: 0.5rem 0;
+      line-height: 1.4;
+    }
+    .profile-info strong {
+      color: #ff8c00;
+    }
+
+    /* ----------- BUTTONS ----------- */
+    .btn {
+      background: #ff8c00;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1rem;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #ffa500;
+    }
+    .back-btn {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header basique -->
+  <header>
+    <h1>Page de Profil</h1>
+  </header>
+
+  <!-- Conteneur principal -->
+  <div class="profile-container">
+    <div id="profile-card" class="profile-card">
+      <!-- Contenu du profil injecté par JS -->
+    </div>
+    <!-- Bouton retour -->
+    <button class="btn back-btn" id="back-home">Retour à l’accueil</button>
+  </div>
+
+  <script>
+    // Récupérer le paramètre ?uid=...
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('uid');
+
+    // Charger la liste des utilisateurs
+    let users = JSON.parse(localStorage.getItem('vigameursUsers')) || [];
+    const user = users.find(u => u.userId === userId);
+
+    const profileCard = document.getElementById('profile-card');
+    const backHomeBtn = document.getElementById('back-home');
+
+    if (!user) {
+      // Si l'utilisateur n'existe pas
+      profileCard.innerHTML = `
+        <p>Aucun utilisateur ne correspond à l’ID <b>${userId}</b>.</p>
+        <p>Il est possible que vous ne soyez pas connecté ou que le compte n’existe plus.</p>
+      `;
+    } else {
+      // On suppose user.email / user.avatar existent
+      const pseudo = user.username;
+      const email = user.email || user.username; 
+      const avatar = user.avatar || 'https://via.placeholder.com/120x120.png?text=Avatar'; 
+      const dateCreation = new Date(user.createdAt).toLocaleString();
+      const userIdText = user.userId;
+
+      profileCard.innerHTML = `
+        <div class="profile-header">
+          <img src="${avatar}" alt="Avatar de ${pseudo}">
+          <h2>${pseudo}</h2>
+        </div>
+        <div class="profile-info">
+          <p><strong>Email :</strong> ${email}</p>
+          <p><strong>ID :</strong> ${userIdText}</p>
+          <p><strong>Compte créé le :</strong> ${dateCreation}</p>
+        </div>
+      `;
+    }
+
+    // Bouton "Retour à l'accueil"
+    backHomeBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
