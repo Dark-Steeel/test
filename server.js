@@ -144,3 +144,7 @@ passport.use(new GoogleStrategy({
   console.log(profile);
   done(null, profile);
 }));
+app.get("/privacy-policy", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "privacy-policy.html"));
+});
+
