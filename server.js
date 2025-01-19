@@ -135,3 +135,12 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur http://localhost:${PORT}`);
 });
+passport.use(new GoogleStrategy({
+  clientID: "VOTRE_GOOGLE_CLIENT_ID",
+  clientSecret: "VOTRE_GOOGLE_CLIENT_SECRET",
+  callbackURL: "http://localhost:3000/auth/google/callback"
+}, (accessToken, refreshToken, profile, done) => {
+  // Logique pour gérer l'utilisateur
+  console.log(profile);
+  done(null, profile);
+}));
