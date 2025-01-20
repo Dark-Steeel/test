@@ -7,6 +7,45 @@
   <!-- Roboto (Google Fonts) -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+  body {
+    background-color: lightblue;
+  }
+  /* Conteneur des boutons */
+.auth-buttons {
+  display: flex; /* Aligne les enfants horizontalement */
+  gap: 10px; /* Espacement entre les boutons */
+  justify-content: center; /* Centre les boutons horizontalement */
+  margin-top: 20px; /* Ajoute un espace au-dessus */
+}
+
+/* Style des boutons */
+.auth-buttons .btn {
+  display: inline-block;
+  padding: 10px 20px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #ff8c00;
+  border-radius: 5px;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+/* Effet hover */
+.auth-buttons .btn:hover {
+  background-color: #ffa500;
+  
+  @media (max-width: 600px) {
+    .auth-buttons {
+      flex-direction: column;
+      gap: 15px; /* Espacement vertical entre les boutons */
+    }
+  }
+  
+}
+
+  
     /* ----------------------  STYLES GLOBAUX  ---------------------- */
     * {
       box-sizing: border-box;
@@ -551,6 +590,92 @@
       <button id="logout-btn">Déconnexion</button>
     </div>
   </div>
+/* Style pour la superposition de la modale */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Style pour le contenu de la modale */
+.modal {
+  background: #1f2530;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+/* Titre de la modale */
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #ff8c00;
+}
+
+/* Bouton de fermeture */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #ff8c00;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #ffa500;
+}
+
+/* Champs de formulaire */
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="password"] {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: #2b2f3b;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.modal input:focus {
+  border-color: #ff8c00;
+  outline: none;
+}
+
+/* Bouton de soumission */
+.modal button[type="submit"] {
+  width: 100%;
+  padding: 0.8rem;
+  background: #ff8c00;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal button:hover {
+  background: #ffa500;
+}
 
   <!-- ====================== JAVASCRIPT ====================== -->
   <script>
