@@ -1,3 +1,13 @@
+console.log("Le fichier server.js est bien exécuté !");
+
+console.log("Le serveur est en cours de démarrage...");
+
+console.log("Le serveur démarre...");
+
+console.log("Début de l'exécution du serveur");
+
+// Import des modules nécessaires
+const mongoose = require('mongoose');
 const express = require("express");
 const passport = require("passport");
 const session = require("express-session");
@@ -6,15 +16,19 @@ const path = require("path");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 
+console.log("Le fichier server.js est en cours d'exécution...");
+
+// Initialisation d'Express
 const app = express();
 
-// Configurer le dossier pour les uploads
-const upload = multer({ dest: "uploads/" });
+// Connexion à MongoDB
+const DB_URI = "mongodb://localhost:27017/vigameurs";
 
-// Simule une base de données
-const users = [];
+mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("✅ MongoDB connecté avec succès 🚀"))
+  .catch((err) => console.error("❌ Erreur de connexion à MongoDB :", err));
 
-// Configurer les sessions
+// Configuration des sessions
 app.use(
   session({
     secret: "vigameurs-secret-key",
@@ -26,9 +40,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, "public")));
+
+// Gestion des fichiers uploadés
+const upload = multer({ dest: "uploads/" });
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Sérialisation des utilisateurs
+const users = [];
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => {
   const user = users.find((u) => u.id === id);
@@ -84,24 +102,16 @@ passport.use(
   )
 );
 
-// Routes pour l'authentification
+// Routes d'authentification
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login.html" }),
-  (req, res) => {
-    res.redirect("/profile.html");
-  }
-);
+app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/login.html" }), (req, res) => {
+  res.redirect("/profile.html");
+});
 
 app.get("/auth/facebook", passport.authenticate("facebook", { scope: ["email"] }));
-app.get(
-  "/auth/facebook/callback",
-  passport.authenticate("facebook", { failureRedirect: "/login.html" }),
-  (req, res) => {
-    res.redirect("/profile.html");
-  }
-);
+app.get("/auth/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login.html" }), (req, res) => {
+  res.redirect("/profile.html");
+});
 
 // API pour les profils
 app.get("/api/profile", (req, res) => {
@@ -127,24 +137,19 @@ app.put("/api/profile", upload.single("avatar"), (req, res) => {
   res.json(user);
 });
 
-// Servir les fichiers statiques
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Route pour la politique de confidentialité
+app.get("/privacy-policy", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "privacy-policy.html"));
+});
 
-// Lancer le serveur
+// Route principale
+app.get("/", (req, res) => {
+  res.send("le Serveur fonctionne !");
+});
+
+// Lancement du serveur
+console.log("Le fichier server.js est en cours d'exécution...");
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+  console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
 });
-passport.use(new GoogleStrategy({
-    clientID: "VOTRE_GOOGLE_CLIENT_ID",
-    clientSecret: "VOTRE_GOOGLE_CLIENT_SECRET",
-    callbackURL: "http://localhost:3000/auth/google/callback"
-  }, (accessToken, refreshToken, profile, done) => {
-    // Logique pour gérer l'utilisateur
-    console.log(profile);
-    done(null, profile);
-  }));
-  app.get("/privacy-policy", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "privacy-policy.html"));
-  });
-
