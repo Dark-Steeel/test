@@ -1,155 +1,121 @@
-console.log("Le fichier server.js est bien exécuté !");
+require('dotenv').config();
 
-console.log("Le serveur est en cours de démarrage...");
+// Vérification des variables d'environnement
+console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID || "Non défini");
+console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET || "Non défini");
+console.log("FACEBOOK_APP_ID:", process.env.FACEBOOK_APP_ID || "Non défini");
+console.log("FACEBOOK_APP_SECRET:", process.env.FACEBOOK_APP_SECRET || "Non défini");
 
-console.log("Le serveur démarre...");
-
-console.log("Début de l'exécution du serveur");
-
-// Import des modules nécessaires
 const mongoose = require('mongoose');
-const express = require("express");
-const passport = require("passport");
-const session = require("express-session");
-const multer = require("multer");
-const path = require("path");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const FacebookStrategy = require("passport-facebook").Strategy;
+const express = require('express');
+const passport = require('passport');
+const session = require('express-session');
+const multer = require('multer');
+const path = require('path');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 
-console.log("Le fichier server.js est en cours d'exécution...");
-
-// Initialisation d'Express
 const app = express();
 
 // Connexion à MongoDB
-const DB_URI = "mongodb://localhost:27017/vigameurs";
+const DB_URI = 'mongodb://localhost:27017/vigameurs';
+mongoose.connect(DB_URI)
+    .then(() => console.log('✅ MongoDB connecté avec succès 🚀'))
+    .catch((err) => console.error('❌ Erreur de connexion à MongoDB :', err));
 
-mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ MongoDB connecté avec succès 🚀"))
-  .catch((err) => console.error("❌ Erreur de connexion à MongoDB :", err));
-
-// Configuration des sessions
-app.use(
-  session({
-    secret: "vigameurs-secret-key",
+// Sessions
+app.use(session({
+    secret: 'vigameurs-secret-key',
     resave: false,
     saveUninitialized: true,
-  })
-);
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Gestion des fichiers uploadés
-const upload = multer({ dest: "uploads/" });
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Uploads
+const upload = multer({ dest: 'uploads/' });
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Sérialisation des utilisateurs
-const users = [];
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser((id, done) => {
-  const user = users.find((u) => u.id === id);
-  done(null, user || false);
+// OAuth Strategies
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: 'http://localhost:3000/auth/google/callback',
+    }, (accessToken, refreshToken, profile, done) => {
+        done(null, profile);
+    }));
+} else {
+    console.error("❌ Google OAuth n'est pas configuré. Vérifiez vos variables d'environnement.");
+}
+
+if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
+    passport.use(new FacebookStrategy({
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_APP_SECRET,
+        callbackURL: 'http://localhost:3000/auth/facebook/callback',
+    }, (accessToken, refreshToken, profile, done) => {
+        done(null, profile);
+    }));
+} else {
+    console.error("❌ Facebook OAuth n'est pas configuré. Vérifiez vos variables d'environnement.");
+}
+
+// Routes
+app.get('/api/auth/login', (req, res) => {
+    res.status(200).json({ message: 'Route login accessible !' });
 });
 
-// Google OAuth Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: "GOOGLE_CLIENT_ID",
-      clientSecret: "GOOGLE_CLIENT_SECRET",
-      callbackURL: "http://localhost:3000/auth/google/callback",
-    },
-    (accessToken, refreshToken, profile, done) => {
-      let user = users.find((u) => u.id === profile.id);
-      if (!user) {
-        user = {
-          id: profile.id,
-          username: profile.displayName,
-          email: profile.emails[0].value,
-          avatar: profile.photos[0].value,
-        };
-        users.push(user);
-      }
-      done(null, user);
+app.get('/', (req, res) => {
+    console.log('Headers reçus :', req.headers);
+    console.log('Route GET / appelée');
+    res.send("Bienvenue sur le serveur Vigameurs !");
+});
+
+// Route pour la suppression des données
+app.get('/delete-data', (req, res) => {
+    const filePath = path.join(__dirname, 'delete-data.html');
+    console.log('Chemin du fichier :', filePath);
+    res.sendFile(filePath);
+});
+
+// Route POST pour login
+app.post('/api/auth/login', (req, res) => {
+    const { email, password } = req.body;
+    if (email === "gamerx@email.com" && password === "monmotdepasse") {
+        res.status(200).json({ message: "Connexion réussie !" });
+    } else {
+        res.status(401).json({ message: "Identifiants invalides" });
     }
-  )
-);
+});
 
-// Facebook OAuth Strategy
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: "FACEBOOK_APP_ID",
-      clientSecret: "FACEBOOK_APP_SECRET",
-      callbackURL: "http://localhost:3000/auth/facebook/callback",
-      profileFields: ["id", "displayName", "photos", "email"],
-    },
-    (accessToken, refreshToken, profile, done) => {
-      let user = users.find((u) => u.id === profile.id);
-      if (!user) {
-        user = {
-          id: profile.id,
-          username: profile.displayName,
-          email: profile.emails ? profile.emails[0].value : "Non défini",
-          avatar: profile.photos[0].value,
-        };
-        users.push(user);
-      }
-      done(null, user);
+// Route POST pour créer un utilisateur
+app.post('/api/users', (req, res) => {
+    try {
+        console.log('Requête reçue :', req.body);
+        res.status(201).send('Utilisateur créé');
+    } catch (error) {
+        console.error('Erreur lors du traitement :', error.message);
+        res.status(500).send('Erreur interne du serveur');
     }
-  )
-);
-
-// Routes d'authentification
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/login.html" }), (req, res) => {
-  res.redirect("/profile.html");
 });
 
-app.get("/auth/facebook", passport.authenticate("facebook", { scope: ["email"] }));
-app.get("/auth/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login.html" }), (req, res) => {
-  res.redirect("/profile.html");
+// Routes pour Google
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+    res.redirect('/profile'); // Redirection après succès
 });
 
-// API pour les profils
-app.get("/api/profile", (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Non authentifié" });
-  }
-  res.json(req.user);
+// Routes pour Facebook
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), (req, res) => {
+    res.redirect('/profile'); // Redirection après succès
 });
 
-app.put("/api/profile", upload.single("avatar"), (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Non authentifié" });
-  }
-  const user = users.find((u) => u.id === req.user.id);
-  if (!user) {
-    return res.status(404).json({ message: "Utilisateur non trouvé" });
-  }
-  user.username = req.body.username || user.username;
-  user.bio = req.body.bio || user.bio;
-  if (req.file) {
-    user.avatar = `/uploads/${req.file.filename}`;
-  }
-  res.json(user);
-});
-
-// Route pour la politique de confidentialité
-app.get("/privacy-policy", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "privacy-policy.html"));
-});
-
-// Route principale
-app.get("/", (req, res) => {
-  res.send("le Serveur fonctionne !");
-});
-
-// Lancement du serveur
-console.log("Le fichier server.js est en cours d'exécution...");
-const PORT = 3000;
+// Démarrage du serveur
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
+    console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
 });

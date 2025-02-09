@@ -5,32 +5,25 @@ const openLoginBtn = document.getElementById('open-login');
 const goToSignupLink = document.getElementById('go-to-signup');
 const closeLoginBtn = document.getElementById('close-login');
 const closeSignupBtn = document.getElementById('close-signup');
+const openSignupLink = document.getElementById('create-account'); // Le bouton/lien qui ouvre la modale
 
 // Ouvrir la modale de connexion
-openLoginBtn.addEventListener('click', () => {
-  loginModal.style.display = 'flex';
-});
+if (openLoginBtn) {
+  openLoginBtn.addEventListener('click', () => {
+    loginModal.style.display = 'flex';
+  });
+}
 
-// Ouvrir la modale de création de compte
-goToSignupLink.addEventListener('click', (e) => {
-  e.preventDefault();
-  loginModal.style.display = 'none'; // Ferme la modale de connexion
-  signupModal.style.display = 'flex'; // Ouvre la modale de création de compte
-});
+// Ouvrir la modale de création de compte depuis la connexion
+if (goToSignupLink) {
+  goToSignupLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginModal.style.display = 'none'; // Ferme la modale de connexion
+    signupModal.style.display = 'flex'; // Ouvre la modale de création de compte
+  });
+}
 
-// Fermer les modales
-closeLoginBtn.addEventListener('click', () => {
-  loginModal.style.display = 'none';
-});
-closeSignupBtn.addEventListener('click', () => {
-  signupModal.style.display = 'none';
-});
-// Sélection des éléments HTML
-const signupModal = document.getElementById('signup-modal');
-const openSignupLink = document.getElementById('create-account'); // Le bouton/lien qui ouvre la modale
-const closeSignupBtn = document.getElementById('close-signup');
-
-// Ouvrir la modale de création de compte
+// Ouvrir la modale de création de compte depuis le lien principal
 if (openSignupLink) {
   openSignupLink.addEventListener('click', (e) => {
     e.preventDefault();
@@ -38,7 +31,12 @@ if (openSignupLink) {
   });
 }
 
-// Fermer la modale de création de compte
+// Fermer les modales
+if (closeLoginBtn) {
+  closeLoginBtn.addEventListener('click', () => {
+    loginModal.style.display = 'none';
+  });
+}
 if (closeSignupBtn) {
   closeSignupBtn.addEventListener('click', () => {
     signupModal.style.display = 'none';
